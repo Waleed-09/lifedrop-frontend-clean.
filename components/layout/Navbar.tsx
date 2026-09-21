@@ -11,7 +11,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isLoggedIn, logout } = useAuth();
+  const { user, token, isLoggedIn: contextIsLoggedIn, logout } = useAuth();
   const toast = useToast();
 
   const handleLogout = () => {
@@ -29,7 +29,9 @@ export default function Navbar() {
     { title: "Contact", href: "/contact" },
   ];
 
-  const isAdmin = user?.role === "admin" || user?.email?.includes("admin");
+  const hasToken = typeof window !== "undefined" ? Boolean(localStorage.getItem("lifedrop_token")) : Boolean(token);
+  const isLoggedIn = Boolean(contextIsLoggedIn && hasToken && user);
+  const isAdmin = Boolean(isLoggedIn && user?.role === "admin");
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm">

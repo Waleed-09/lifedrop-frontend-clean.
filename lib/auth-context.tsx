@@ -45,10 +45,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshUser = async () => {
+    if (typeof window === "undefined") {
+      setIsLoading(false);
+      return;
+    }
+
     const storedToken = localStorage.getItem("lifedrop_token");
     if (!storedToken) {
       setUser(null);
       setToken(null);
+      localStorage.removeItem("lifedrop_user");
       setIsLoading(false);
       return;
     }
@@ -64,20 +70,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         const savedUserStr = localStorage.getItem("lifedrop_user");
         if (savedUserStr) {
-          setUser(JSON.parse(savedUserStr));
+          try {
+            setUser(JSON.parse(savedUserStr));
+          } catch {
+            setUser(null);
+            setToken(null);
+            localStorage.removeItem("lifedrop_token");
+            localStorage.removeItem("lifedrop_user");
+          }
         } else {
           setUser(null);
+          setToken(null);
+          localStorage.removeItem("lifedrop_token");
         }
       }
     } catch (err) {
-      console.warn("Could not fetch user session from API. Using local session.");
+      console.warn("Could not fetch user session from API. Checking local session.");
       const savedUserStr = localStorage.getItem("lifedrop_user");
       if (savedUserStr) {
         try {
           setUser(JSON.parse(savedUserStr));
         } catch {
           setUser(null);
+          setToken(null);
+          localStorage.removeItem("lifedrop_token");
+          localStorage.removeItem("lifedrop_user");
         }
+      } else {
+        setUser(null);
+        setToken(null);
+        localStorage.removeItem("lifedrop_token");
       }
     } finally {
       setIsLoading(false);
@@ -88,7 +110,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     refreshUser();
 
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "lifedrop_token") {
+      if (e.key === "lifedrop_token" || e.key === "lifedrop_user") {
         refreshUser();
       }
     };
@@ -112,6 +134,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("lifedrop_user");
     setToken(null);
     setUser(null);
+    setIsLoading(false);
   };
 
   const updateUser = (data: Partial<UserProfile>) => {
@@ -123,12 +146,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
+  const isLoggedIn = Boolean(token && user);
+
   return (
     <AuthContext.Provider
       value={{
         user,
         token,
-        isLoggedIn: Boolean(token),
+        isLoggedIn,
         isLoading,
         login,
         logout,

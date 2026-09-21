@@ -3,14 +3,6 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
   let token = typeof window !== 'undefined' ? localStorage.getItem('lifedrop_token') : null;
 
-  // Ensure fallback token if user session exists
-  if (!token && typeof window !== 'undefined') {
-    const savedUser = localStorage.getItem('lifedrop_user');
-    if (savedUser) {
-      token = 'lifedrop_mock_jwt_bearer_token_123456';
-    }
-  }
-
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
