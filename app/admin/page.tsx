@@ -166,9 +166,10 @@ export default function AdminDashboardPage() {
     if (!isLoading) {
       if (!isLoggedIn) {
         toast.error("Please login to access the Admin Panel.");
-        router.push("/login");
+        router.replace("/login");
       } else if (!isAdmin) {
         toast.error("Access Denied: Only authorized administrators can access this area.");
+        router.replace("/login");
       } else {
         fetchAllAdminData();
       }
@@ -494,30 +495,8 @@ export default function AdminDashboardPage() {
     return Math.ceil(totalItems / ITEMS_PER_PAGE) || 1;
   };
 
-  if (!isLoading && (!isLoggedIn || !isAdmin)) {
-    return (
-      <>
-        <Navbar />
-        <main className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
-          <div className="max-w-md w-full bg-white rounded-3xl p-8 shadow-xl border border-slate-200 text-center">
-            <div className="mx-auto w-16 h-16 rounded-2xl bg-red-100 flex items-center justify-center text-red-600 mb-4">
-              <ShieldAlert className="w-8 h-8" />
-            </div>
-            <h2 className="text-2xl font-black text-slate-900 mb-2">Access Restricted</h2>
-            <p className="text-slate-600 text-sm mb-6 leading-relaxed">
-              You must be authenticated as a system administrator to access the LifeDrop Moderation Command Center.
-            </p>
-            <button
-              onClick={() => router.push("/login")}
-              className="w-full py-3.5 px-6 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold transition shadow-lg shadow-red-200"
-            >
-              Go to Login Page
-            </button>
-          </div>
-        </main>
-        <Footer />
-      </>
-    );
+  if (isLoading || !isLoggedIn || !isAdmin) {
+    return null;
   }
 
   return (
