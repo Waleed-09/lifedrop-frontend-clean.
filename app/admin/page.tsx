@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { apiFetch } from "@/lib/api";
@@ -160,20 +160,19 @@ export default function AdminDashboardPage() {
     targetId: 0,
   });
 
+  const redirectFiredRef = useRef(false);
   const isAdmin = user?.role === "admin";
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!isLoggedIn) {
-        toast.error("Please login to access the Admin Panel.");
-        router.replace("/login");
-      } else if (!isAdmin) {
-        toast.error("Access Denied: Only authorized administrators can access this area.");
-        router.replace("/login");
-      } else {
-        fetchAllAdminData();
-      }
+    if (isLoading || redirectFiredRef.current) return;
+
+    if (!isLoggedIn || !isAdmin) {
+      redirectFiredRef.current = true;
+      window.location.href = "/login";
+      return;
     }
+
+    fetchAllAdminData();
   }, [isLoading, isLoggedIn, isAdmin]);
 
   // Reset page when switching tabs or filters

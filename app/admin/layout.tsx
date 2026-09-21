@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useToast } from "@/components/ui/Toast";
@@ -10,24 +10,31 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const toast = useToast();
   const [redirecting, setRedirecting] = useState(false);
+  const redirectFiredRef = useRef(false);
 
   // Extra guard: Check token in localStorage or AuthContext
   const hasToken = typeof window !== "undefined" ? Boolean(localStorage.getItem("lifedrop_token")) : Boolean(token);
   const isAdmin = user?.role === "admin";
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!isLoggedIn || !hasToken) {
-        setRedirecting(true);
-        toast.error("Please login to access the Admin Panel.");
-        router.replace("/login");
-      } else if (!isAdmin) {
-        setRedirecting(true);
-        toast.error("Access Denied: Only authorized administrators can access this area.");
-        router.replace("/login");
-      }
+    if (isLoading || redirectFiredRef.current) return;
+
+    if (!isLoggedIn || !hasToken) {
+      redirectFiredRef.current = true;
+      setRedirecting(true);
+      toast.error("Please login to access the Admin Panel.");
+      window.location.href = "/login";
+      return;
     }
-  }, [isLoading, isLoggedIn, hasToken, isAdmin, router, toast]);
+
+    if (!isAdmin) {
+      redirectFiredRef.current = true;
+      setRedirecting(true);
+      toast.error("Access Denied: Only authorized administrators can access this area.");
+      window.location.href = "/login";
+      return;
+    }
+  }, [isLoading, isLoggedIn, hasToken, isAdmin, toast]);
 
   // Minimal loading state while checking authentication or redirecting
   if (isLoading || redirecting || !isLoggedIn || !hasToken || !isAdmin) {
