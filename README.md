@@ -24,7 +24,7 @@
 - 🩸 **Blood Compatibility Matrix**: An interactive visual guide helping users understand recipient and donor blood group compatibility.
 - 👤 **Donor Dashboard & Real-Time Availability**: Donors can manage their personal profiles, update last donation dates, and toggle their active availability status instantly.
 - 🛡️ **Admin Moderation Portal**: Dedicated administrative section for overseeing requests, managing registered donors, and monitoring platform metrics.
-- 📊 **Platform Statistics & Impact Metrics**: Live metrics displaying total registered donors, fulfilled requests, partner hospitals, and estimated lives saved.
+- 📊 **Platform Statistics & Impact Metrics**: Live metrics displaying total registered donors, fulfilled requests, partner hospitals, and estimated lives saved
 - ⚡ **Dual-Backend Support**: Built-in mock API fallback in Next.js (`app/api/v1/...`) ensuring the app functions seamlessly even during standalone offline frontend testing without the PHP server active.
 
 ---
