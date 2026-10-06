@@ -8,7 +8,6 @@ import {
   Github,
   Linkedin,
   Mail,
-  Sparkles,
   Terminal,
   Cpu,
   CheckCircle2,
@@ -34,7 +33,7 @@ export default function AboutDeveloper() {
     },
     {
       name: "LinkedIn",
-      href: "https://www.linkedin.com/in/muhammad-waleed-khan-b129b9378/?isSelfProfile=true",
+      href: "https://www.linkedin.com/in/muhammad-waleed-khan-b129b9378",
       icon: Linkedin,
       ariaLabel: "Connect with Muhammad Waleed Khan on LinkedIn",
     },
@@ -59,7 +58,7 @@ export default function AboutDeveloper() {
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           
-          {/* Developer Photo Column (Left on Desktop, Top on Mobile) */}
+          {/* Developer Photo Column */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -68,10 +67,8 @@ export default function AboutDeveloper() {
             className="lg:col-span-5 flex flex-col items-center justify-center"
           >
             <div className="relative group">
-              {/* Animated Accent Frame Glow */}
               <div className="absolute -inset-1.5 rounded-[32px] bg-gradient-to-r from-red-600 via-rose-500 to-red-700 opacity-75 blur-md group-hover:opacity-100 transition duration-500 group-hover:blur-lg" />
               
-              {/* Image Container Card */}
               <div className="relative w-72 h-[380px] sm:w-80 sm:h-[440px] rounded-[28px] overflow-hidden bg-slate-900 p-2 ring-1 ring-slate-800 shadow-2xl">
                 <div className="relative w-full h-full rounded-[22px] overflow-hidden">
                   <Image
@@ -82,12 +79,11 @@ export default function AboutDeveloper() {
                     priority
                     className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
                   />
-                  {/* Subtle Gradient Overlay at image base for contrast */}
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-60" />
                 </div>
               </div>
 
-              {/* Floating Status Pill */}
+              {/* Status Pill */}
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -106,7 +102,7 @@ export default function AboutDeveloper() {
             </div>
           </motion.div>
 
-          {/* Developer Details Column (Right on Desktop) */}
+          {/* Details Column */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -114,7 +110,6 @@ export default function AboutDeveloper() {
             viewport={{ once: true }}
             className="lg:col-span-7 flex flex-col justify-center text-center lg:text-left mt-6 lg:mt-0"
           >
-            {/* Top Badge */}
             <div className="flex justify-center lg:justify-start">
               <span className="inline-flex items-center gap-2 rounded-full bg-red-500/10 border border-red-500/30 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-red-400 shadow-sm">
                 <Code2 className="w-4 h-4 text-red-500" />
@@ -123,7 +118,6 @@ export default function AboutDeveloper() {
               </span>
             </div>
 
-            {/* Name & Title */}
             <h2 className="mt-4 text-3xl sm:text-5xl font-black tracking-tight text-white">
               Muhammad Waleed Khan
             </h2>
@@ -132,7 +126,6 @@ export default function AboutDeveloper() {
               Full-Stack Engineer / Software Developer
             </p>
 
-            {/* Mission / Bio Card */}
             <div className="mt-6 rounded-2xl bg-slate-900/60 backdrop-blur-md p-6 sm:p-7 border border-slate-800 shadow-xl relative overflow-hidden">
               <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-red-500 to-rose-600 rounded-l-2xl" />
               <p className="text-slate-300 text-base sm:text-lg leading-relaxed font-normal">
@@ -159,7 +152,7 @@ export default function AboutDeveloper() {
               </div>
             </div>
 
-            {/* Social & Contact Actions */}
+            {/* Social Links */}
             <div className="mt-10 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                 Connect with Creator:
