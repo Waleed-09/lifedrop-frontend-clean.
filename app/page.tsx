@@ -8,6 +8,7 @@ import Stats from "@/components/home/Stats";
 import BloodCompatibilityMatrix from "@/components/home/BloodCompatibilityMatrix";
 import Testimonials from "@/components/home/Testimonials";
 import EmergencyCTA from "@/components/home/EmergencyCTA";
+import AboutDeveloper from "@/components/AboutDeveloper";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
@@ -24,6 +25,7 @@ export default function HomePage() {
         <FeaturedDonors />
         <Testimonials />
         <EmergencyCTA />
+        <AboutDeveloper />
       </main>
       <Footer />
     </>
