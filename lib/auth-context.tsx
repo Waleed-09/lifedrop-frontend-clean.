@@ -14,6 +14,9 @@ export interface UserProfile {
   role?: "donor" | "recipient" | "admin" | "user";
   is_available?: boolean | number;
   last_donation_date?: string;
+  last_donated_at?: string;
+  is_eligible?: boolean;
+  days_until_eligible?: number;
   created_at?: string;
 }
 

@@ -3,6 +3,38 @@ import { queryDb } from "@/lib/db";
 
 let initialRequests = [
   {
+    id: 101,
+    patient_name: "Muhammad Usman",
+    blood_group: "O+",
+    hospital_name: "Karam Shah Hospital (ICU Emergency Ward)",
+    hospital: "Karam Shah Hospital, Nawagai, Tehsil Mandanr, Buner",
+    city: "Nawagai, Tehsil Mandanr, Buner",
+    contact_number: "03480887480",
+    phone: "03480887480",
+    units: 2,
+    urgency: "critical",
+    status: "pending",
+    is_verified: true,
+    verified_by: "Karam Shah Hospital / Khidmat-e-Insaniyat Blood Bank",
+    created_at: "Just now",
+  },
+  {
+    id: 102,
+    patient_name: "Zainab Bibi",
+    blood_group: "A-",
+    hospital_name: "Khidmat-e-Insaniyat Blood Bank (Karam Shah Hospital)",
+    hospital: "Karam Shah Hospital, Nawagai, Tehsil Mandanr, Buner",
+    city: "Totalai, Tehsil Mandanr, Buner",
+    contact_number: "03463328556",
+    phone: "03463328556",
+    units: 1,
+    urgency: "urgent",
+    status: "pending",
+    is_verified: true,
+    verified_by: "Karam Shah Hospital / Khidmat-e-Insaniyat Blood Bank",
+    created_at: "Today",
+  },
+  {
     id: 201,
     patient_name: "Tariq Mahmood",
     blood_group: "B+",
@@ -14,6 +46,7 @@ let initialRequests = [
     units: 2,
     urgency: "critical",
     status: "pending",
+    is_verified: false,
     created_at: "2026-08-26",
   },
   {
@@ -28,6 +61,7 @@ let initialRequests = [
     units: 1,
     urgency: "urgent",
     status: "pending",
+    is_verified: false,
     created_at: "2026-08-25",
   },
   {
@@ -42,6 +76,7 @@ let initialRequests = [
     units: 3,
     urgency: "normal",
     status: "fulfilled",
+    is_verified: false,
     created_at: "2026-08-24",
   },
 ];
@@ -74,6 +109,15 @@ export async function POST(request: Request) {
     const urgency = body.urgency || "urgent";
     const status = "pending";
 
+    const isHospitalVerified = 
+      hospitalName.toLowerCase().includes("karam") || 
+      hospitalName.toLowerCase().includes("khidmat") || 
+      body.is_verified === true;
+
+    const verifiedBy = isHospitalVerified 
+      ? "Karam Shah Hospital / Khidmat-e-Insaniyat Blood Bank" 
+      : undefined;
+
     try {
       const res: any = await queryDb(
         `INSERT INTO blood_requests (patient_name, blood_group, hospital_name, city, contact_number, units, urgency, status)
@@ -94,6 +138,8 @@ export async function POST(request: Request) {
         units: units,
         urgency: urgency,
         status: status,
+        is_verified: isHospitalVerified,
+        verified_by: verifiedBy,
         created_at: new Date().toISOString().split("T")[0],
       };
 
@@ -114,6 +160,8 @@ export async function POST(request: Request) {
       units: units,
       urgency: urgency,
       status: status,
+      is_verified: isHospitalVerified,
+      verified_by: verifiedBy,
       created_at: new Date().toISOString().split("T")[0],
     };
 

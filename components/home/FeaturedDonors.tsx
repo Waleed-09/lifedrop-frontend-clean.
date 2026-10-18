@@ -20,23 +20,23 @@ interface Donor {
 const defaultDonors: Donor[] = [
   {
     id: 1,
-    name: "Ahmed Khan",
-    blood: "A+",
-    city: "Islamabad",
+    name: "Dr. Usman Ali",
+    blood: "O+",
+    city: "Nawagai, Tehsil Mandanr, Buner",
     image: "https://i.pravatar.cc/300?img=11",
   },
   {
     id: 2,
-    name: "Sara Ali",
-    blood: "O+",
-    city: "Lahore",
+    name: "Hamza Khan",
+    blood: "B+",
+    city: "Totalai, Tehsil Mandanr, Buner",
     image: "https://i.pravatar.cc/300?img=32",
   },
   {
     id: 3,
-    name: "Usman Tariq",
-    blood: "B-",
-    city: "Karachi",
+    name: "Sajjad Ahmad",
+    blood: "A-",
+    city: "Chinglai, Tehsil Mandanr, Buner",
     image: "https://i.pravatar.cc/300?img=18",
   },
 ];

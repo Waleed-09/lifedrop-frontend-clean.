@@ -5,8 +5,8 @@ import { ToastProvider } from "@/components/ui/Toast";
 
 export const metadata: Metadata = {
   title: "LifeDrop — Emergency Blood Donation & Assistance Platform",
-  description: "Connect verified blood donors with patients in urgent need across Pakistan in real-time.",
-  keywords: ["blood donation", "pakistan", "blood donor", "emergency blood", "abbottabad blood bank", "lifedrop"],
+  description: "Official digital network with Khidmat-e-Insaniyat Blood Bank & Karam Shah Hospital, connecting verified blood donors across Tehsil Mandanr, Buner & KPK.",
+  keywords: ["blood donation", "pakistan", "blood donor", "emergency blood", "karam shah hospital", "khidmat-e-insaniyat", "buner blood bank", "nawagai", "lifedrop"],
 };
 
 export default function RootLayout({

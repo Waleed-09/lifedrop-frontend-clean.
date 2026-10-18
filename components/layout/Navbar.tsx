@@ -6,6 +6,7 @@ import { Menu, X, HeartPulse, LogOut, User, ShieldCheck, Droplets } from "lucide
 import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useToast } from "@/components/ui/Toast";
+import HospitalAnnouncementBar from "./HospitalAnnouncementBar";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -35,6 +36,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm">
+      {pathname === "/" && <HospitalAnnouncementBar />}
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
 
         {/* Logo & Brand */}

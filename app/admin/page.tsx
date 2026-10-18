@@ -70,6 +70,9 @@ interface DonorItem {
   status?: "active" | "deactivated" | string;
   total_donations?: number;
   last_donation_date?: string;
+  last_donated_at?: string;
+  is_eligible?: boolean;
+  days_until_eligible?: number;
   created_at?: string;
 }
 
@@ -272,10 +275,100 @@ export default function AdminDashboardPage() {
       );
       toast.success(`Donor verification ${nextVerified ? "granted ✓" : "revoked"}`);
     } catch {
+      try {
+        const localRes = await fetch(`/api/v1/admin/donors/${donor.id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer local",
+          },
+          body: JSON.stringify({ is_verified: nextVerified }),
+        });
+        if (localRes.ok) {
+          setDonors((prev) =>
+            prev.map((d) => (d.id === donor.id ? { ...d, is_verified: nextVerified } : d))
+          );
+          toast.success(`Donor verification ${nextVerified ? "granted ✓" : "revoked"}`);
+          return;
+        }
+      } catch {}
+
       setDonors((prev) =>
         prev.map((d) => (d.id === donor.id ? { ...d, is_verified: nextVerified } : d))
       );
       toast.success(`Donor badge ${nextVerified ? "verified ✓" : "updated"}`);
+    }
+  };
+
+  const getDonorCooldownInfo = (donor: DonorItem) => {
+    const rawDate = donor.last_donated_at || donor.last_donation_date;
+    if (!rawDate) {
+      return { isEligible: true, daysRemaining: 0 };
+    }
+    const lastDate = new Date(rawDate);
+    if (isNaN(lastDate.getTime())) {
+      return { isEligible: true, daysRemaining: 0 };
+    }
+    const nextEligible = new Date(lastDate);
+    nextEligible.setDate(lastDate.getDate() + 90);
+    const diff = nextEligible.getTime() - new Date().getTime();
+    const daysRemaining = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    if (daysRemaining <= 0) {
+      return { isEligible: true, daysRemaining: 0 };
+    }
+    return { isEligible: false, daysRemaining };
+  };
+
+  const handleMarkDonated = async (donor: DonorItem) => {
+    try {
+      const res = await apiFetch(`/donors/${donor.id}/mark-donated`, {
+        method: "POST",
+      });
+
+      toast.success(res?.message || `Marked ${donor.name} as donated! 90-day cooldown active.`);
+
+      setDonors((prev) =>
+        prev.map((d) =>
+          d.id === donor.id
+            ? {
+                ...d,
+                last_donated_at: new Date().toISOString(),
+                last_donation_date: new Date().toISOString().split("T")[0],
+                is_eligible: false,
+                days_until_eligible: 90,
+                total_donations: (d.total_donations || 0) + 1,
+              }
+            : d
+        )
+      );
+    } catch {
+      // Local Next.js fallback
+      try {
+        const localRes = await fetch(`/api/v1/donors/${donor.id}/mark-donated`, {
+          method: "POST",
+        });
+        if (localRes.ok) {
+          const localData = await localRes.json();
+          toast.success(localData?.message || `Marked ${donor.name} as donated! 90-day cooldown active.`);
+          setDonors((prev) =>
+            prev.map((d) =>
+              d.id === donor.id
+                ? {
+                    ...d,
+                    last_donated_at: new Date().toISOString(),
+                    last_donation_date: new Date().toISOString().split("T")[0],
+                    is_eligible: false,
+                    days_until_eligible: 90,
+                    total_donations: (d.total_donations || 0) + 1,
+                  }
+                : d
+            )
+          );
+          return;
+        }
+      } catch {}
+
+      toast.error(`Could not record donation for ${donor.name}.`);
     }
   };
 
@@ -707,12 +800,15 @@ export default function AdminDashboardPage() {
                         <th className="p-4">Location</th>
                         <th className="p-4">Contact Phone</th>
                         <th className="p-4">Availability</th>
+                        <th className="p-4">Eligibility / Cooldown</th>
                         <th className="p-4">Verification</th>
                         <th className="p-4 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                      {getPaginatedList(filteredDonors).map((donor) => (
+                      {getPaginatedList(filteredDonors).map((donor) => {
+                        const cooldown = getDonorCooldownInfo(donor);
+                        return (
                         <tr key={donor.id} className="hover:bg-slate-50/80 transition">
                           <td className="p-4">
                             <p className="font-bold text-slate-900 flex items-center gap-1.5">
@@ -738,6 +834,17 @@ export default function AdminDashboardPage() {
                             </span>
                           </td>
                           <td className="p-4">
+                            {cooldown.isEligible ? (
+                              <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 inline-flex items-center gap-1">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Eligible to Donate
+                              </span>
+                            ) : (
+                              <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-200 inline-flex items-center gap-1">
+                                <Clock className="w-3.5 h-3.5 text-amber-600" /> In Recovery ({cooldown.daysRemaining}d left)
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-4">
                             <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
                               donor.is_verified
                                 ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
@@ -748,6 +855,23 @@ export default function AdminDashboardPage() {
                           </td>
                           <td className="p-4 text-right">
                             <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => handleMarkDonated(donor)}
+                                disabled={!cooldown.isEligible}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition border inline-flex items-center gap-1 shadow-sm ${
+                                  cooldown.isEligible
+                                    ? "bg-red-600 text-white hover:bg-red-700 border-red-700 cursor-pointer"
+                                    : "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                                }`}
+                                title={
+                                  cooldown.isEligible
+                                    ? "Mark this donor as having completed a donation (starts 90-day cooldown)"
+                                    : `Donor is already in 90-day cooldown (${cooldown.daysRemaining} days remaining)`
+                                }
+                              >
+                                <Droplets className="w-3.5 h-3.5" />
+                                {cooldown.isEligible ? "Mark as Donated" : "In Recovery"}
+                              </button>
                               <button
                                 onClick={() => handleToggleDonorVerification(donor)}
                                 className="px-3 py-1.5 rounded-xl text-xs font-bold transition border bg-emerald-600 text-white hover:bg-emerald-700"
@@ -772,7 +896,8 @@ export default function AdminDashboardPage() {
                             </div>
                           </td>
                         </tr>
-                      ))}
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

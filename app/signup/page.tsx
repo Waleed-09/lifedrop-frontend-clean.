@@ -7,13 +7,14 @@ import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { useToast } from "@/components/ui/Toast";
 import { HeartPulse, User, Mail, Phone, MapPin, Lock, UserPlus, ArrowLeft, Droplet } from "lucide-react";
+import { MANDANR_AREAS, OTHER_PAKISTAN_CITIES, DEFAULT_SEARCH_LOCATION } from "@/lib/locations";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [bloodGroup, setBloodGroup] = useState("A+");
-  const [address, setAddress] = useState("Abbottabad");
+  const [address, setAddress] = useState(DEFAULT_SEARCH_LOCATION);
   const [role, setRole] = useState("donor");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
@@ -167,17 +168,28 @@ export default function SignupPage() {
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">City / Station</label>
+            <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-700">District: Buner ➔ Tehsil: Mandanr Area / Station</label>
             <div className="relative">
-              <MapPin className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
-              <input
-                type="text"
+              <MapPin className="w-5 h-5 text-red-600 absolute left-3.5 top-3.5" />
+              <select
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                placeholder="e.g. Abbottabad"
-                required
-                className="w-full rounded-xl border border-slate-200 pl-11 p-3.5 text-sm bg-slate-50 focus:bg-white focus:border-red-600 outline-none transition font-medium"
-              />
+                className="w-full rounded-xl border border-slate-200 pl-11 p-3.5 text-sm bg-slate-50 focus:bg-white focus:border-red-600 outline-none font-bold text-slate-800 transition"
+              >
+                <optgroup label="District: Buner ➔ Tehsil: Mandanr (Primary Focus)">
+                  {MANDANR_AREAS.map((area) => (
+                    <option key={area.name} value={area.name}>
+                      {area.displayName || area.name}
+                    </option>
+                  ))}
+                  <option value="Buner">Whole District Buner</option>
+                </optgroup>
+                <optgroup label="Other Districts & Cities">
+                  {OTHER_PAKISTAN_CITIES.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </optgroup>
+              </select>
             </div>
           </div>
 

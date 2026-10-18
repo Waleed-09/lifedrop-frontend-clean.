@@ -22,6 +22,7 @@ import {
   History,
   ShieldCheck
 } from "lucide-react";
+import { MANDANR_AREAS, OTHER_PAKISTAN_CITIES, DEFAULT_SEARCH_LOCATION } from "@/lib/locations";
 
 interface DonationRecord {
   id: number;
@@ -67,9 +68,14 @@ export default function DonorDashboardPage() {
 
   // 90-day cooldown logic
   const calculateCooldown = () => {
-    if (!lastDonationDate) return { isEligible: true, daysRemaining: 0, nextDate: "Today" };
+    const rawDate = user?.last_donated_at || user?.last_donation_date || lastDonationDate;
+    if (!rawDate) return { isEligible: true, daysRemaining: 0, nextDate: "Today" };
 
-    const lastDate = new Date(lastDonationDate);
+    const lastDate = new Date(rawDate);
+    if (isNaN(lastDate.getTime())) {
+      return { isEligible: true, daysRemaining: 0, nextDate: "Today" };
+    }
+
     const today = new Date();
     const nextEligibleDate = new Date(lastDate);
     nextEligibleDate.setDate(lastDate.getDate() + 90);
@@ -153,16 +159,22 @@ export default function DonorDashboardPage() {
 
               {/* Status Badge Card */}
               <div className="flex shrink-0 items-center gap-3.5 rounded-2xl bg-white/15 backdrop-blur-md p-4 border border-white/20">
-                {isAvailable ? (
+                {cooldown.isEligible ? (
                   <CheckCircle2 className="w-9 h-9 text-emerald-300 shrink-0" />
                 ) : (
-                  <XCircle className="w-9 h-9 text-amber-300 shrink-0" />
+                  <Clock className="w-9 h-9 text-amber-300 shrink-0" />
                 )}
                 <div>
-                  <p className="text-xs text-red-100 font-bold uppercase tracking-wider">Status</p>
-                  <p className="text-xl font-black">
-                    {isAvailable ? "Ready to Donate" : "Unavailable"}
-                  </p>
+                  <p className="text-xs text-red-100 font-bold uppercase tracking-wider">Medical Status</p>
+                  {cooldown.isEligible ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-500/30 text-emerald-100 border border-emerald-400/40 mt-1">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" /> Eligible to Donate
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-amber-500/30 text-amber-100 border border-amber-400/40 mt-1">
+                      <Clock className="w-3.5 h-3.5 text-amber-300" /> In Recovery Period — Eligible in {cooldown.daysRemaining} days
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -181,14 +193,22 @@ export default function DonorDashboardPage() {
             </div>
 
             <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200 flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                <Activity className="w-6 h-6" />
+              <div className={`flex h-12 w-12 items-center justify-center rounded-xl font-bold ${
+                cooldown.isEligible ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
+              }`}>
+                {cooldown.isEligible ? <CheckCircle2 className="w-6 h-6" /> : <Clock className="w-6 h-6" />}
               </div>
               <div>
-                <p className="text-xs font-bold text-slate-500 uppercase">Availability</p>
-                <p className={`text-lg font-black ${isAvailable ? 'text-emerald-600' : 'text-slate-400'}`}>
-                  {isAvailable ? 'Active On Map' : 'Hidden'}
-                </p>
+                <p className="text-xs font-bold text-slate-500 uppercase">Eligibility</p>
+                {cooldown.isEligible ? (
+                  <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-200 mt-1">
+                    Eligible to Donate
+                  </span>
+                ) : (
+                  <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-100 text-amber-900 border border-amber-200 mt-1">
+                    In Recovery Period — Eligible in {cooldown.daysRemaining} days
+                  </span>
+                )}
               </div>
             </div>
 
@@ -296,18 +316,52 @@ export default function DonorDashboardPage() {
                   {/* City Location */}
                   <div className="sm:col-span-2">
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                      City / Current Location
+                      District: Buner ➔ Tehsil: Mandanr Area / Location
                     </label>
                     <div className="relative">
-                      <MapPin className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
-                      <input
-                        type="text"
+                      <MapPin className="w-5 h-5 text-red-600 absolute left-3.5 top-3.5" />
+                      <select
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        placeholder="e.g. Abbottabad, KPK"
-                        required
-                        className="w-full rounded-xl border border-slate-200 pl-11 p-3.5 text-slate-900 font-medium bg-slate-50 focus:bg-white focus:border-red-600 outline-none transition"
-                      />
+                        className="w-full rounded-xl border border-slate-200 pl-11 p-3.5 text-slate-900 font-bold bg-slate-50 focus:bg-white focus:border-red-600 outline-none transition text-sm sm:text-base"
+                      >
+                        <optgroup label="District: Buner ➔ Tehsil: Mandanr (Primary Focus)">
+                          {MANDANR_AREAS.map((area) => (
+                            <option key={area.name} value={area.name}>
+                              {area.displayName || area.name}
+                            </option>
+                          ))}
+                          <option value="Buner">Whole District Buner</option>
+                        </optgroup>
+                        <optgroup label="Other Districts & Cities">
+                          {OTHER_PAKISTAN_CITIES.map((c) => (
+                            <option key={c} value={c}>{c}</option>
+                          ))}
+                        </optgroup>
+                        {city && !OTHER_PAKISTAN_CITIES.includes(city) && !MANDANR_AREAS.some(a => a.name === city) && city !== "Buner" && (
+                          <optgroup label="Current Saved Location">
+                            <option value={city}>{city}</option>
+                          </optgroup>
+                        )}
+                      </select>
+                    </div>
+
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase">Tehsil Mandanr:</span>
+                      {MANDANR_AREAS.map((area) => (
+                        <button
+                          key={area.name}
+                          type="button"
+                          onClick={() => setCity(area.name)}
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-md border transition ${
+                            city.toLowerCase() === area.name.toLowerCase()
+                              ? "bg-red-600 text-white border-red-600"
+                              : "bg-slate-100 text-slate-700 border-slate-200 hover:bg-red-50 hover:text-red-700"
+                          }`}
+                        >
+                          {area.name}
+                        </button>
+                      ))}
                     </div>
                   </div>
 

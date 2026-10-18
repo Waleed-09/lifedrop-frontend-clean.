@@ -9,9 +9,9 @@ const testimonials = [
     id: 1,
     name: "Dr. Tariq Mahmood",
     role: "Emergency Coordinator",
-    city: "Abbottabad",
+    city: "Nawagai, Buner",
     comment:
-      "Ayub Medical Complex mein urgent surgery ke waqt LifeDrop ne minutes mein O- donors dhoond nikaalay. Absolutely life-saving platform!",
+      "Karam Shah Hospital & Khidmat-e-Insaniyat Blood Bank mein urgent surgery ke waqt LifeDrop ne minutes mein O- donors dhoond nikaalay. Absolutely life-saving platform!",
     rating: 5,
     badge: "Verified Medical Pro",
     image: "https://i.pravatar.cc/150?img=60",

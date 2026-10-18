@@ -44,9 +44,13 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
 
     return data;
   } catch (err: any) {
-    // If external PHP server connection fails (e.g. localhost:8000 unreachable), try local Next.js route
+    // If external PHP server connection fails (e.g. localhost:8000 unreachable or 500 error), try local Next.js route
     if (
-      (err.name === 'TypeError' || err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError')) &&
+      (err.name === 'TypeError' ||
+       err.message?.includes('Failed to fetch') ||
+       err.message?.includes('NetworkError') ||
+       err.message?.includes('API error (5') ||
+       err.message?.includes('Internal Server Error')) &&
       !fullUrl.startsWith('/api/v1')
     ) {
       console.warn(`[LifeDrop API] External PHP backend unreachable at ${fullUrl}. Using local Next.js API handler.`);

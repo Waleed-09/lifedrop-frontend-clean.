@@ -57,17 +57,18 @@ export default function AboutPage() {
           <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-black/10 blur-3xl pointer-events-none" />
 
           <div className="relative z-10 mx-auto max-w-7xl px-6 text-center">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md px-4 py-1.5 text-xs font-bold tracking-wide uppercase text-red-100 border border-white/20 mb-6">
-              <Droplet className="w-4 h-4 fill-red-200 text-red-200" /> Saving Lives Through Technology
-            </span>
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md px-4 py-1.5 text-xs font-extrabold tracking-wide uppercase text-white border border-white/20 mb-6 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Official Healthcare Deployment — Karam Shah Hospital & Khidmat-e-Insaniyat</span>
+            </div>
 
-            <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-tight">
+            <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-tight text-white drop-shadow-sm">
               Bridging the Gap Between <br className="hidden sm:inline" />
-              <span className="text-amber-300">Donors & Emergency Seekers</span>
+              <span className="text-white">Donors & Emergency Seekers</span>
             </h1>
 
-            <p className="mx-auto mt-6 max-w-3xl text-lg text-red-100 leading-relaxed font-medium">
-              LifeDrop is a real-time blood connection ecosystem designed to eliminate delay in critical medical situations. We connect verified blood donors directly with patients and healthcare centers instantly.
+            <p className="mx-auto mt-6 max-w-3xl text-base sm:text-lg text-red-100 leading-relaxed font-medium">
+              LifeDrop is the official community blood connection network in partnership with <strong className="text-white font-bold">Karam Shah Hospital</strong> and <strong className="text-white font-bold">Khidmat-e-Insaniyat Blood Bank</strong>. We connect verified blood donors directly with patients across Nawagai, Tehsil Mandanr, and District Buner in real-time.
             </p>
           </div>
         </section>
@@ -82,6 +83,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-4xl font-black text-slate-900">{stats.donorsCount}</h3>
               <p className="text-slate-500 font-bold text-sm mt-1">Verified Donors</p>
+              <span className="text-xs text-red-600 font-semibold mt-0.5">Tehsil Mandanr & Buner</span>
             </div>
 
             <div className="flex flex-col items-center p-4 border-y md:border-y-0 md:border-x border-slate-100 hover:scale-105 transition duration-300">
@@ -90,14 +92,16 @@ export default function AboutPage() {
               </div>
               <h3 className="text-4xl font-black text-slate-900">{stats.requestsCount}</h3>
               <p className="text-slate-500 font-bold text-sm mt-1">Lives Impacted</p>
+              <span className="text-xs text-emerald-600 font-semibold mt-0.5">Rapid Blood Response</span>
             </div>
 
             <div className="flex flex-col items-center p-4 hover:scale-105 transition duration-300">
               <div className="p-3 bg-red-50 rounded-2xl mb-3">
                 <Building2 className="w-8 h-8 text-red-600" />
               </div>
-              <h3 className="text-4xl font-black text-slate-900">{stats.hospitalsCount}</h3>
-              <p className="text-slate-500 font-bold text-sm mt-1">Hospital Networks</p>
+              <h3 className="text-4xl font-black text-slate-900">24/7 Active</h3>
+              <p className="text-slate-500 font-bold text-sm mt-1">Karam Shah Hospital Base</p>
+              <span className="text-xs text-slate-400 font-semibold mt-0.5">Khidmat-e-Insaniyat Blood Bank</span>
             </div>
 
           </div>
@@ -118,7 +122,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Instant Search</h3>
               <p className="text-slate-600 text-sm leading-relaxed">
-                Filter donors by specific blood group and location (e.g., Abbottabad) with zero latency.
+                Filter donors by specific blood group and location (e.g., Nawagai, Buner) with zero latency.
               </p>
             </div>
 
@@ -180,6 +184,28 @@ export default function AboutPage() {
                       <h4 className="font-bold text-slate-900 text-sm">Privacy Safe</h4>
                       <p className="text-xs text-slate-500">Secure data controls</p>
                     </div>
+                  </div>
+                </div>
+
+                {/* Karam Shah Hospital Partner Box */}
+                <div className="mt-6 rounded-2xl bg-gradient-to-r from-red-50 via-white to-rose-50 border border-red-200 p-5 flex flex-col sm:flex-row items-center gap-4 shadow-sm">
+                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-white p-1 border border-red-300 shadow-sm">
+                    <img
+                      src="/images/karam-shah-hospital.jpg"
+                      alt="Karam Shah Hospital Emblem"
+                      className="h-full w-full object-contain rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-extrabold uppercase tracking-wide text-red-700 bg-red-100 px-2.5 py-0.5 rounded-full border border-red-200">
+                      Official Healthcare Deployment
+                    </span>
+                    <h4 className="text-base font-black text-slate-900 mt-1.5">
+                      Karam Shah Hospital & Khidmat-e-Insaniyat Blood Bank
+                    </h4>
+                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                      Official digital platform partner providing 24/7 emergency blood requests and live donor matching across Karam Shah Hospital aur gird-o-nawash ke ilaaqon mein.
+                    </p>
                   </div>
                 </div>
               </div>

@@ -6,6 +6,12 @@ import Footer from "@/components/layout/Footer";
 import { apiFetch } from "@/lib/api";
 import { useToast } from "@/components/ui/Toast";
 import { 
+  MANDANR_AREAS, 
+  OTHER_PAKISTAN_CITIES, 
+  PRIMARY_HOSPITAL_LOCATION, 
+  DEFAULT_SEARCH_LOCATION 
+} from "@/lib/locations";
+import { 
   AlertCircle, 
   MapPin, 
   Phone, 
@@ -36,6 +42,8 @@ interface BloodRequest {
   urgency: string;
   status?: string;
   created_at?: string;
+  is_verified?: boolean;
+  verified_by?: string;
 }
 
 interface Donor {
@@ -57,7 +65,7 @@ export default function RequestPage() {
   const [patientName, setPatientName] = useState("");
   const [bloodGroup, setBloodGroup] = useState("B+");
   const [hospital, setHospital] = useState("");
-  const [city, setCity] = useState("Abbottabad");
+  const [city, setCity] = useState(DEFAULT_SEARCH_LOCATION);
   const [phone, setPhone] = useState("");
   const [units, setUnits] = useState(1);
   const [urgency, setUrgency] = useState("urgent");
@@ -65,6 +73,7 @@ export default function RequestPage() {
   // Filters State
   const [filterGroup, setFilterGroup] = useState("all");
   const [filterUrgency, setFilterUrgency] = useState("all");
+  const [filterVerifiedOnly, setFilterVerifiedOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const [loading, setLoading] = useState(false);
@@ -103,6 +112,10 @@ export default function RequestPage() {
     setLoading(true);
     setMatchingDonors([]);
 
+    const isKSH = 
+      hospital.toLowerCase().includes("karam") || 
+      hospital.toLowerCase().includes("khidmat");
+
     const payload = {
       patient_name: patientName,
       blood_group: bloodGroup,
@@ -118,6 +131,8 @@ export default function RequestPage() {
       latitude: 34.1688,
       longitude: 73.2215,
       status: "pending",
+      is_verified: isKSH,
+      verified_by: isKSH ? "Karam Shah Hospital / Khidmat-e-Insaniyat Blood Bank" : undefined,
     };
 
     try {
@@ -138,6 +153,8 @@ export default function RequestPage() {
         units: Number(units),
         urgency: urgency,
         status: "pending",
+        is_verified: res?.is_verified ?? isKSH,
+        verified_by: res?.verified_by ?? (isKSH ? "Karam Shah Hospital / Khidmat-e-Insaniyat Blood Bank" : undefined),
         created_at: "Just now",
       };
 
@@ -192,6 +209,15 @@ export default function RequestPage() {
   const filteredRequests = requests.filter((req) => {
     const matchesGroup = filterGroup === "all" || req.blood_group === filterGroup;
     const matchesUrgency = filterUrgency === "all" || req.urgency?.toLowerCase() === filterUrgency.toLowerCase();
+    
+    const isKSH = Boolean(
+      req.is_verified || 
+      (req.hospital || req.hospital_name || "").toLowerCase().includes("karam") || 
+      (req.hospital || req.hospital_name || "").toLowerCase().includes("khidmat") ||
+      req.verified_by
+    );
+    const matchesVerified = !filterVerifiedOnly || isKSH;
+
     const query = searchQuery.toLowerCase();
     const matchesQuery = 
       !query ||
@@ -199,7 +225,7 @@ export default function RequestPage() {
       (req.hospital || req.hospital_name || "").toLowerCase().includes(query) ||
       (req.city || "").toLowerCase().includes(query);
 
-    return matchesGroup && matchesUrgency && matchesQuery;
+    return matchesGroup && matchesUrgency && matchesVerified && matchesQuery;
   });
 
   return (
@@ -210,7 +236,7 @@ export default function RequestPage() {
         <section className="mx-auto max-w-7xl">
           
           {/* Page Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6">
             <div>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3.5 py-1 text-xs font-bold text-red-600 uppercase border border-red-200 mb-2">
                 <AlertCircle className="w-4 h-4 text-red-600" /> Real-Time Emergency Stream
@@ -230,6 +256,48 @@ export default function RequestPage() {
               <PlusCircle className="w-5 h-5" />
               {showForm ? "Close Form" : "Post Emergency Request"}
             </button>
+          </div>
+
+          {/* Official Partner Alert Banner */}
+          <div className="mb-10 rounded-3xl bg-gradient-to-r from-red-950 via-slate-900 to-red-900 p-5 sm:p-6 text-white shadow-xl border border-red-800/40 flex flex-col md:flex-row items-center justify-between gap-5 relative overflow-hidden">
+            <div className="flex items-center gap-4">
+              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-white p-1 border-2 border-red-500/50 shadow">
+                <img
+                  src="/images/karam-shah-hospital.jpg"
+                  alt="Karam Shah Hospital Emblem"
+                  className="h-full w-full object-contain rounded-xl"
+                />
+              </div>
+
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full bg-red-500/20 border border-red-400/30 px-3 py-0.5 text-xs font-bold text-red-300 mb-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Official Healthcare & Blood Partner
+                </div>
+                <h2 className="text-lg sm:text-xl font-black text-white">
+                  Karam Shah Hospital & Khidmat-e-Insaniyat Blood Bank
+                </h2>
+                <p className="text-xs text-slate-300 mt-0.5 font-medium">
+                  Verified cases receive top emergency donor matching. Direct Helpline: <strong className="text-white">+92 348 0887480</strong>
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto">
+              <a
+                href="tel:+923480887480"
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl bg-red-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-red-700 transition shadow"
+              >
+                <Phone className="w-3.5 h-3.5 text-emerald-300" /> Call Hospital
+              </a>
+              <a
+                href="https://wa.me/923480887480?text=Salam!%20Urgent%20blood%20request%20for%20Karam%20Shah%20Hospital."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 transition shadow"
+              >
+                WhatsApp Desk
+              </a>
+            </div>
           </div>
 
           {/* Form Section */}
@@ -281,22 +349,69 @@ export default function RequestPage() {
                     type="text"
                     value={hospital}
                     onChange={(e) => setHospital(e.target.value)}
-                    placeholder="e.g. Ayub Medical Complex, ICU Ward 3"
+                    placeholder="e.g. Karam Shah Hospital, Emergency Ward"
                     required
                     className="w-full rounded-xl border border-slate-200 p-3.5 text-sm bg-slate-50 focus:bg-white focus:border-red-600 outline-none transition font-medium"
                   />
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setHospital(PRIMARY_HOSPITAL_LOCATION);
+                        setCity(DEFAULT_SEARCH_LOCATION);
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-red-50 border border-red-200 px-2.5 py-1 text-[11px] font-bold text-red-700 hover:bg-red-100 transition"
+                    >
+                      <Hospital className="w-3 h-3 text-red-600" />
+                      + Karam Shah Hospital, Nawagai, Tehsil Mandanr, Buner
+                    </button>
+                  </div>
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-700">City / Location</label>
-                  <input
-                    type="text"
+                  <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-700">District: Buner ➔ Tehsil: Mandanr Area</label>
+                  <select
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    placeholder="e.g. Abbottabad"
-                    required
-                    className="w-full rounded-xl border border-slate-200 p-3.5 text-sm bg-slate-50 focus:bg-white focus:border-red-600 outline-none transition font-medium"
-                  />
+                    className="w-full rounded-xl border border-slate-200 p-3.5 text-sm bg-slate-50 focus:bg-white focus:border-red-600 outline-none font-bold text-slate-800 transition"
+                  >
+                    <optgroup label="District: Buner ➔ Tehsil: Mandanr (Primary Focus)">
+                      {MANDANR_AREAS.map((area) => (
+                        <option key={area.name} value={area.name}>
+                          {area.displayName || area.name}
+                        </option>
+                      ))}
+                      <option value="Buner">Whole District Buner</option>
+                    </optgroup>
+                    <optgroup label="Other Districts & Cities">
+                      {OTHER_PAKISTAN_CITIES.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </optgroup>
+                    {city && !OTHER_PAKISTAN_CITIES.includes(city) && !MANDANR_AREAS.some(a => a.name === city) && city !== "Buner" && (
+                      <optgroup label="Custom Location">
+                        <option value={city}>{city}</option>
+                      </optgroup>
+                    )}
+                  </select>
+
+                  <div className="mt-2 flex flex-wrap items-center gap-1">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">Tehsil Mandanr:</span>
+                    {MANDANR_AREAS.map((area) => (
+                      <button
+                        key={area.name}
+                        type="button"
+                        onClick={() => setCity(area.name)}
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-md border transition ${
+                          city.toLowerCase() === area.name.toLowerCase()
+                            ? "bg-red-600 text-white border-red-600"
+                            : "bg-slate-100 text-slate-700 border-slate-200 hover:bg-red-50 hover:text-red-700"
+                        }`}
+                      >
+                        {area.name}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div>
@@ -436,6 +551,20 @@ export default function RequestPage() {
                 <option value="urgent">Urgent Only</option>
                 <option value="normal">Normal Only</option>
               </select>
+
+              {/* Verified Partner Filter */}
+              <button
+                type="button"
+                onClick={() => setFilterVerifiedOnly(!filterVerifiedOnly)}
+                className={`rounded-xl px-3 py-2 text-xs font-bold transition flex items-center gap-1.5 border ${
+                  filterVerifiedOnly
+                    ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
+                    : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                }`}
+              >
+                <CheckCircle className="w-3.5 h-3.5" />
+                Verified Hospital Cases
+              </button>
             </div>
 
             {/* Search Input */}
@@ -466,11 +595,45 @@ export default function RequestPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredRequests.map((req, idx) => {
                 const isFulfilled = req.status?.toLowerCase() === "fulfilled";
+                const isKSHVerified = Boolean(
+                  req.is_verified || 
+                  (req.hospital || req.hospital_name || "").toLowerCase().includes("karam") || 
+                  (req.hospital || req.hospital_name || "").toLowerCase().includes("khidmat") ||
+                  req.verified_by
+                );
+
                 return (
-                  <div key={req.id || idx} className={`rounded-3xl bg-white p-6 shadow-md border flex flex-col justify-between transition-all duration-300 hover:shadow-xl ${
-                    isFulfilled ? "border-emerald-200 bg-emerald-50/20" : "border-slate-200"
+                  <div key={req.id || idx} className={`rounded-3xl bg-white p-6 shadow-md border flex flex-col justify-between transition-all duration-300 hover:shadow-xl relative overflow-hidden ${
+                    isFulfilled 
+                      ? "border-emerald-200 bg-emerald-50/20" 
+                      : isKSHVerified 
+                      ? "border-red-300 ring-2 ring-red-100 shadow-lg" 
+                      : "border-slate-200"
                   }`}>
+                    {isKSHVerified && (
+                      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 via-rose-500 to-emerald-500" />
+                    )}
+
                     <div>
+                      {/* Verified Hospital Badge */}
+                      {isKSHVerified && (
+                        <div className="mb-4 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-300/80 p-3 shadow-xs">
+                          <div className="flex items-center gap-2">
+                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white shadow-xs">
+                              <CheckCircle className="w-3.5 h-3.5" />
+                            </span>
+                            <span className="flex-1 text-[11px] sm:text-xs leading-tight font-extrabold text-emerald-950">
+                              Verified by Karam Shah Hospital / Khidmat-e-Insaniyat Blood Bank
+                            </span>
+                            <span className="h-2 w-2 rounded-full bg-red-600 shrink-0" title="Hospital Verified Case" />
+                          </div>
+                          <div className="mt-2 pt-2 border-t border-emerald-200/60 flex items-center gap-1.5 text-xs font-black text-emerald-900">
+                            <Hospital className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                            <span>Karam Shah Hospital, Nawagai, Tehsil Mandanr, Buner</span>
+                          </div>
+                        </div>
+                      )}
+
                       <div className="flex items-center justify-between mb-4">
                         <span className="text-3xl font-black text-red-600 bg-red-50 px-3.5 py-1 rounded-2xl border border-red-100">
                           {req.blood_group}
@@ -496,13 +659,15 @@ export default function RequestPage() {
                       </h3>
 
                       <div className="space-y-2.5 text-sm text-slate-600 mb-6">
-                        <p className="flex items-center gap-2">
-                          <Hospital className="w-4 h-4 text-red-600 shrink-0" /> 
-                          <span className="font-semibold text-slate-800">{req.hospital || req.hospital_name || "Hospital N/A"}</span>
+                        <p className="flex items-start gap-2">
+                          <Hospital className="w-4 h-4 text-red-600 shrink-0 mt-0.5" /> 
+                          <span className="font-semibold text-slate-800">
+                            {isKSHVerified ? "Karam Shah Hospital, Nawagai, Tehsil Mandanr, Buner" : (req.hospital || req.hospital_name || "Hospital N/A")}
+                          </span>
                         </p>
-                        <p className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-red-600 shrink-0" /> 
-                          <span>{req.city || req.requester?.address || "Abbottabad, PK"}</span>
+                        <p className="flex items-start gap-2">
+                          <MapPin className="w-4 h-4 text-red-600 shrink-0 mt-0.5" /> 
+                          <span>{req.city || req.requester?.address || (isKSHVerified ? "Nawagai, Tehsil Mandanr, Buner" : "Buner, KPK")}</span>
                         </p>
                         <p className="flex items-center gap-2">
                           <Droplet className="w-4 h-4 text-red-600 shrink-0 fill-red-600" /> 

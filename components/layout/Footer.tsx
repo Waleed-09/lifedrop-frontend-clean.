@@ -14,8 +14,11 @@ export default function Footer() {
             <Droplets className="w-8 h-8 text-red-600 fill-red-600" />
             <span>LifeDrop</span>
           </div>
-          <p className="text-sm text-gray-400 leading-relaxed mb-6">
-            Connecting blood donors with patients in urgent need across Pakistan in real-time.
+          <p className="text-sm text-gray-400 leading-relaxed mb-3">
+            Official Community Blood Network for <strong className="text-white">Karam Shah Hospital</strong> in partnership with <strong className="text-white">Khidmat-e-Insaniyat Blood Bank</strong>.
+          </p>
+          <p className="text-xs text-emerald-400 font-semibold mb-4">
+            ● 24/7 Live Emergency Transfusion Desks
           </p>
           <p className="text-xs text-gray-500 flex items-center gap-1">
             Made with <Heart className="w-3.5 h-3.5 text-red-600 fill-red-600" /> for humanity.
@@ -35,10 +38,10 @@ export default function Footer() {
 
         {/* Col 3: Support */}
         <div>
-          <h4 className="text-white font-bold text-lg mb-4">Support</h4>
+          <h4 className="text-white font-bold text-lg mb-4">Support & Hospital</h4>
           <ul className="space-y-2 text-sm">
-            <li><Link href="/about" className="hover:text-red-500 transition">About Us</Link></li>
-            <li><Link href="/contact" className="hover:text-red-500 transition">Contact Us</Link></li>
+            <li><Link href="/about" className="hover:text-red-500 transition">About Partnership</Link></li>
+            <li><Link href="/contact" className="hover:text-red-500 transition">Hospital Hotlines</Link></li>
             <li><Link href="/privacy" className="hover:text-red-500 transition">Privacy Policy</Link></li>
             <li><Link href="/terms" className="hover:text-red-500 transition">Terms of Service</Link></li>
           </ul>
@@ -46,15 +49,25 @@ export default function Footer() {
 
         {/* Col 4: Contact Info */}
         <div>
-          <h4 className="text-white font-bold text-lg mb-4">Get in Touch</h4>
+          <h4 className="text-white font-bold text-lg mb-4">Hospital Helplines</h4>
           <ul className="space-y-3 text-sm text-gray-400">
-            <li className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-red-500 shrink-0" />
-              <span>Abbottabad, Khyber Pakhtunkhwa</span>
+            <li className="flex items-start gap-2">
+              <MapPin className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+              <span>Karam Shah Hospital, KPK, Pakistan</span>
             </li>
-            <li className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-red-500 shrink-0" />
-              <span>+92 3493657462</span>
+            <li className="flex items-start gap-2">
+              <Phone className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-white font-bold">+92 348 0887480</p>
+                <p className="text-xs text-gray-400">Hospital Emergency Reception (24/7)</p>
+              </div>
+            </li>
+            <li className="flex items-start gap-2">
+              <Phone className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-white font-bold">+92 346 3328556 / +92 346 9420358</p>
+                <p className="text-xs text-gray-400">Khidmat-e-Insaniyat Blood In-Charges</p>
+              </div>
             </li>
             <li className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-red-500 shrink-0" />
